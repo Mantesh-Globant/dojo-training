@@ -20,4 +20,3 @@ jobs:
         run: |
           echo "Blocking merges for 3 days..."
           exit 1
-x
