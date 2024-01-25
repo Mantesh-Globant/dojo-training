@@ -1,0 +1,22 @@
+name: Block Merges for 3 Days
+
+on:
+  workflow_run:
+    workflows: ["CI Workflow"]
+    types:
+      - completed
+
+jobs:
+  block-merges:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check if 3 days have passed
+        id: check_time
+        run: echo "::set-output name=block::$(test $(($(date +%s) - $(date -d '2024-01-25T00:00:00Z' +%s))) -lt 259200)"
+
+      - name: Block if necessary
+        if: steps.check_time.outputs.block == 'true'
+        run: |
+          echo "Blocking merges for 3 days..."
+          exit 1
