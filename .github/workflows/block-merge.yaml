@@ -1,22 +1,41 @@
-name: Block Merges for 3 Days
+name: Block Merge on Main
 
 on:
-  workflow_run:
-    workflows: CI Workflow
+  pull_request:
     types:
-      - completed
+      - opened
+      - synchronize
 
 jobs:
-  block-merges:
+  block-merge:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check if 3 days have passed
-        id: check_time
-        run: echo "::set-output name=block::$(test $(($(date +%s) - $(date -d '2024-01-25T00:00:00Z' +%s))) -lt 259200)"
+      - name: Check if branch is main
+        run: echo "Branch: ${{ github.head_ref }}"
+        if: startsWith(github.head_ref, 'main')
 
-      - name: Block if necessary
-        if: steps.check_time.outputs.block == 'true'
+      - name: Set up Git
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install Git
         run: |
-          echo "Blocking merges for 3 days..."
-          exit 1
+          sudo apt-get install git
+          git config --global user.email "mahantesh.biradar@globant.com"
+          git config --global user.name "Mantesh-Globant"
+
+      - name: Clone repository
+        run: git clone https://github.com/Mantesh-Globant/dojo-training.git
+
+      - name: Block merge for 3 days
+        run: |
+          current_date=$(date +"2024-01-29 09:45:05")
+          allowed_date=$(date -d "$current_date + 3 days" +"2024-01-31 09:45:05")
+          echo "Current date: $current_date"
+          echo "Allowed date: $allowed_date"
+          if [[ "$current_date" < "$allowed_date" ]]; then
+            echo "Blocking merge for 3 days. Please wait."
+            exit 1
+          fi
