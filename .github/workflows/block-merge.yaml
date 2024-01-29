@@ -25,7 +25,6 @@ jobs:
           sudo apt-get install git
           git config --global user.email "mahantesh.biradar@globant.com"
           git config --global user.name "Mantesh-Globant"
-
       - name: Clone repository
         run: git clone https://github.com/Mantesh-Globant/dojo-training.git
 
@@ -35,7 +34,7 @@ jobs:
           allowed_date=$(date -d "$current_date + 3 days" +"2024-01-31 09:45:05")
           echo "Current date: $current_date"
           echo "Allowed date: $allowed_date"
-          if [[ "$current_date" < "$allowed_date" ]]; then
+          if [ "$current_date" \< "$allowed_date" ]; then
             echo "Blocking merge for 3 days. Please wait."
             exit 1
           fi
